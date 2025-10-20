@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus } from "lucide-react";
+import { Plus, QrCode } from "lucide-react"; // Import QrCode icon
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
@@ -94,6 +94,23 @@ const AgencyDashboard = () => {
                   <p className="text-sm text-green-600">{stat.change}</p>
                 </Card>
               ))}
+            {/* Boarding Control Card */}
+            <Link to="/agency/boarding-control">
+              <Card className="p-6 shadow-card h-full flex flex-col justify-between hover:bg-muted/50 transition-colors">
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-hero">
+                        <QrCode className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Suivi
+                    </p>
+                    <p className="text-3xl font-bold mb-2">Contrôle des Embarquements</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Voir les tickets récemment scannés</p>
+              </Card>
+            </Link>
         </div>
 
         {/* Tabs */}

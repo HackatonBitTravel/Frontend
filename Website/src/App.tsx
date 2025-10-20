@@ -19,6 +19,7 @@ import MyBookings from "./pages/MyBookings";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import About from "./pages/About";
+import BoardingControl from "./pages/BoardingControl";
 import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/agency/login" element={<AgencyLogin />} />
             <Route path="/agency/dashboard" element={<AgencyDashboard />} />
             <Route path="/agency/add-trip" element={<AddTrip />} />
+            <Route path="/agency/boarding-control" element={<BoardingControl />} />
             <Route path="/verify" element={<TicketVerification />} />
             <Route path="/my-bookings" element={<MyBookings />} />
             <Route path="/signin" element={<SignIn />} />
