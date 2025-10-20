@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Africabless Verification</string>
+    <string name="title_activity_main">BitTravel</string>
+    <string name="package_name">com.africabless.verify</string>
+    <string name="custom_url_scheme">com.africabless.verify</string>
+</resources>
