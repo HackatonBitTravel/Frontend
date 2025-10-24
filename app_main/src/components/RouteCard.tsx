@@ -3,6 +3,9 @@ import { Star, ArrowRight, Clock, Bus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useBooking } from "@/context/BookingContext";
 import { format } from "date-fns";
+import routeDakar from "@/assets/route-dakar.jpg";
+import routeBamako from "@/assets/route-bamako.jpg";
+import routeAbidjan from "@/assets/route-abidjan.jpg";
 
 interface Schedule {
   id: string;
@@ -44,7 +47,16 @@ const RouteCard = ({ schedule }: RouteCardProps) => {
   
   // Placeholder for rating, as it's not in the schedule object yet
   const rating = agencyRating || 4.5; 
-  const image = "https://placehold.co/400x200?text=Image+de+voyage"; // Placeholder image
+  
+  // Select image based on route
+  let image = routeDakar; // Default image
+  if (origin?.toLowerCase().includes('dakar') && destination?.toLowerCase().includes('bamako')) {
+    image = routeBamako;
+  } else if (origin?.toLowerCase().includes('bamako') && destination?.toLowerCase().includes('abidjan')) {
+    image = routeAbidjan;
+  } else if (origin?.toLowerCase().includes('abidjan') && destination?.toLowerCase().includes('dakar')) {
+    image = routeDakar;
+  }
 
   return (
     <div className="group bg-gradient-card rounded-xl overflow-hidden shadow-card hover:shadow-elevated transition-all duration-300 hover:-translate-y-1 animate-scale-in">

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { MessageCircle, X, Send, Globe, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getChatbotResponse } from "@/lib/api";
+import { marked } from "marked";
 
 const CHATBOT_STORAGE_KEY = "bitbot_conversation_history";
 
@@ -194,9 +195,8 @@ const Chatbot = () => {
                       ? "bg-gradient-hero text-white"
                       : "bg-muted text-foreground"
                   }`}
-                >
-                  {msg.content}
-                </div>
+                  dangerouslySetInnerHTML={{ __html: msg.role === "user" ? msg.content : marked.parse(msg.content) }}
+                />
               </div>
             ))}
             

@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/chatbot/(.*)",
+      "destination": "https://bitbot-1.onrender.com/$1"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "https://backend-s7gk.onrender.com/$1"
+    }
+  ]
+}

@@ -8,6 +8,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useBooking } from "@/context/BookingContext";
 import { useEffect } from "react";
 import { format } from "date-fns";
+import routeDakar from "@/assets/route-dakar.jpg";
+import routeBamako from "@/assets/route-bamako.jpg";
+import routeAbidjan from "@/assets/route-abidjan.jpg";
 
 const TripDetails = () => {
   const { selectedTrip } = useBooking();
@@ -72,7 +75,16 @@ const TripDetails = () => {
 
   // Placeholder for rating and image, as they are not directly in the schedule object yet
   const rating = agency?.rating || 4.5;
-  const image = "https://placehold.co/600x400?text=Image+de+voyage"; // Placeholder image
+  
+  // Select image based on route
+  let image = routeDakar; // Default image
+  if (origin?.toLowerCase().includes('dakar') && destination?.toLowerCase().includes('bamako')) {
+    image = routeBamako;
+  } else if (origin?.toLowerCase().includes('bamako') && destination?.toLowerCase().includes('abidjan')) {
+    image = routeAbidjan;
+  } else if (origin?.toLowerCase().includes('abidjan') && destination?.toLowerCase().includes('dakar')) {
+    image = routeDakar;
+  }
 
   return (
     <div className="min-h-screen bg-background">
