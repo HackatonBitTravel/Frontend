@@ -22,7 +22,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { getMyReservations, getTicketPdfUrl, getScheduleDetails } from "@/lib/api";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { fr } from "date-fns/locale";  
 
 const BookingDetails = () => {
   const { id } = useParams();

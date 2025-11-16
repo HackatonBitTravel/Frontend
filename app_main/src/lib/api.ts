@@ -1,5 +1,23 @@
 // API Base URL
-export const API_BASE_URL = "/api";
+export const API_BASE_URL = "https://backend-s7gk.onrender.com";
+
+// Type definitions for better type safety
+interface AgencyStats {
+  agency_id: string;
+  agency_name: string;
+  active_trips: number;
+  total_passengers: number;
+  monthly_revenue: number;
+  tickets_sold: number;
+  period: string;
+}
+
+interface StatCard {
+  icon: string;
+  label: string;
+  value: string | number;
+  change: string;
+}
 
 // Petit garde de type pour vérifier si une valeur possède une propriété 'name'
 const isNamedError = (v: unknown): v is { name: string } => {
@@ -31,7 +49,6 @@ export const getPopularRoutes = async () => {
 // API function to search for trips
 export const searchTrips = async (filters: { origin?: string; destination?: string; date?: string; min_price?: number; max_price?: number }) => {
   try {
-    // Construire l'URL de recherche avec les paramètres
     const params = new URLSearchParams();
     if (filters.origin) params.append('origin', filters.origin);
     if (filters.destination) params.append('destination', filters.destination);
@@ -61,10 +78,9 @@ export const searchTrips = async (filters: { origin?: string; destination?: stri
 export const createReservation = async (
   schedule_id: string,
   passenger_info: { name: string; phone: string; email: string },
-  token: string | null // Optional token for discount
+  token: string | null
 ) => {
   try {
-    // Vérifier que schedule_id est défini
     if (!schedule_id) {
       throw new Error("schedule_id is required");
     }
@@ -73,7 +89,6 @@ export const createReservation = async (
       'Content-Type': 'application/json',
     };
     
-    // Ajouter le token d'authentification si disponible
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
@@ -192,7 +207,6 @@ export const verifyLightningPayment = async (paymentHash: string, reservationId:
     });
 
     if (!response.ok) {
-      // Log les erreurs backend
       const errorData = await response.json().catch(() => response.text());
       console.error("Backend validation error:", errorData);
       throw new Error(
@@ -314,65 +328,136 @@ export const agencyLogin = async (email: string, password: string) => {
   }
 };
 
-// API function to get agency details
+// API function to get agency details (NOW DYNAMIC!)
 export const getAgencyDetails = async (token: string) => {
-  // Simuler un délai réseau
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return {
-    id: "agency-1",
-    name: "Trans-Sahel Express",
-    email: "contact@transsahel.com",
-    phone: "+22997123456"
-  };
-};
+  try {
+    const response = await fetch(`${API_BASE_URL}/agencies/me`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-// API function to get agency stats
-export const getAgencyStats = async () => {
-  // Simuler un délai réseau
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return [
-    { icon: "Bus", label: "Voyages Actifs", value: 12, change: "+2" },
-    { icon: "Users", label: "Passagers Total", value: 1247, change: "+15%" },
-    { icon: "DollarSign", label: "Revenus (Mois)", value: "450000", change: "+8%" },
-    { icon: "Ticket", label: "Billets Vendus", value: 892, change: "+12%" },
-  ];
-};
-
-// API function to get recent bookings
-export const getRecentBookings = async () => {
-  // Simuler un délai réseau
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return [
-    { id: "BKG001", passenger: "Jean Dupont", route: "Cotonou-Dakar", date: "2025-10-15", amount: "15000", status: "confirmed" },
-    { id: "BKG002", passenger: "Marie Kouakou", route: "Cotonou-Accra", date: "2025-10-16", amount: "12000", status: "pending" },
-    { id: "BKG003", passenger: "Paul Adjovi", route: "Cotonou-Ouagadougou", date: "2025-10-17", amount: "18000", status: "confirmed" },
-  ];
-};
-
-// API function to get upcoming trips for an agency
-export const getUpcomingTrips = async (token: string) => {
-  // Simuler un délai réseau
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  return [
-    {
-      id: "schedule-1",
-      route_id: "route-1",
-      departure_time: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      price: 15000,
-      seats: 45,
-      available_seats: 20,
-      route: {
-        id: "route-1",
-        origin: "Cotonou",
-        destination: "Dakar",
-        duration: 480
-      }
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
     }
-  ];
+
+    const agencyDetails = await response.json();
+    return agencyDetails;
+  } catch (error) {
+    console.error("Error fetching agency details:", error);
+    throw error;
+  }
+};
+
+// API function to get agency stats (NOW DYNAMIC!)
+export const getAgencyStats = async (token: string): Promise<StatCard[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/agencies/stats`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    }
+
+    const statsData: AgencyStats = await response.json();
+    
+    // Formater les données pour correspondre au format attendu par le frontend
+    return [
+      { 
+        icon: "Bus", 
+        label: "Voyages Actifs", 
+        value: statsData.active_trips, 
+        change: "+2 cette semaine" 
+      },
+      { 
+        icon: "Users", 
+        label: "Passagers Total", 
+        value: statsData.total_passengers, 
+        change: "+15% ce mois" 
+      },
+      { 
+        icon: "DollarSign", 
+        label: `Revenus (${statsData.period})`, 
+        value: `${statsData.monthly_revenue.toLocaleString('fr-FR')} FCFA`, 
+        change: "+8% vs mois dernier" 
+      },
+      { 
+        icon: "Ticket", 
+        label: "Billets Vendus", 
+        value: statsData.tickets_sold, 
+        change: "+12% ce mois" 
+      },
+    ];
+  } catch (error) {
+    console.error("Error fetching agency stats:", error);
+    // Retourner des données par défaut en cas d'erreur
+    return [
+      { icon: "Bus", label: "Voyages Actifs", value: 0, change: "N/A" },
+      { icon: "Users", label: "Passagers Total", value: 0, change: "N/A" },
+      { icon: "DollarSign", label: "Revenus (Mois)", value: "0 FCFA", change: "N/A" },
+      { icon: "Ticket", label: "Billets Vendus", value: 0, change: "N/A" },
+    ];
+  }
+};
+
+// API function to get recent bookings (NOW DYNAMIC!)
+export const getRecentBookings = async (token: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/reservations/agency/recent?limit=10`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    }
+
+    const bookings = await response.json();
+    return bookings.map((booking: any) => ({
+      id: booking.id,
+      passenger: booking.passenger,
+      route: booking.route,
+      date: new Date(booking.departure).toLocaleDateString('fr-FR'),
+      amount: `${booking.amount.toLocaleString()} FCFA`,
+      status: booking.status === "COMPLETED" ? "confirmed" : "pending"
+    }));
+  } catch (error) {
+    console.error("Error fetching recent bookings:", error);
+    return [];
+  }
+};
+
+// API function to get upcoming trips for an agency (NOW DYNAMIC!)
+export const getUpcomingTrips = async (token: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedules/agency_schedules?limit=20`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    }
+
+    const schedules = await response.json();
+    return schedules;
+  } catch (error) {
+    console.error("Error fetching upcoming trips:", error);
+    return [];
+  }
 };
 
 // API function to get a chatbot response with retry mechanism
@@ -384,7 +469,6 @@ export const getChatbotResponse = async (message: string, language: string) => {
     try {
       console.log(`Getting bot response for: "${message}" in ${language} (attempt ${attempt + 1})`);
       
-      // Utiliser le proxy pour contourner le CORS
       const response = await fetch('/api/chatbot/chat', {
         method: 'POST',
         headers: {
@@ -394,21 +478,18 @@ export const getChatbotResponse = async (message: string, language: string) => {
           message: message,
           language: language
         }),
-        // Ajout d'un timeout pour éviter les attentes trop longues
-        signal: AbortSignal.timeout(15000) // 15 secondes timeout
+        signal: AbortSignal.timeout(15000)
       });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Essayer de parser comme JSON d'abord
       const contentType = response.headers.get('content-type');
       if (contentType && contentType.includes('application/json')) {
         const data = await response.json();
         return data.response || data.message || "Désolé, je n'ai pas compris votre message.";
       } else {
-        // Si ce n'est pas du JSON, retourner le texte directement
         const text = await response.text();
         return text || "Désolé, je n'ai pas compris votre message.";
       }
@@ -416,26 +497,22 @@ export const getChatbotResponse = async (message: string, language: string) => {
       console.error(`Error getting chatbot response (attempt ${attempt + 1}):`, error);
       lastError = error;
 
-      // Ne pas réessayer pour les erreurs de timeout ou d'annulation
       if (isNamedError(error) && (error.name === 'TimeoutError' || error.name === 'AbortError')) {
         break;
       }
       
-      // Attendre un peu avant de réessayer (sauf pour la dernière tentative)
       if (attempt < maxRetries) {
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
       }
     }
   }
   
-  // Gestion spécifique des timeouts
   if (isNamedError(lastError) && (lastError.name === 'TimeoutError' || lastError.name === 'AbortError')) {
     return language === "fr" 
       ? "Désolé, le chatbot met trop de temps à répondre. Veuillez réessayer." 
       : "Naka nga def, bot bi am ci bokk. Jéemaatal ci kanam.";
   }
   
-  // En cas d'autre erreur, retourner une réponse par défaut
   return language === "fr" 
     ? "Désolé, je rencontre des difficultés techniques. Veuillez réessayer plus tard." 
     : "Naka nga def, ma nga am ci bokk. Jéemaatal ci kanam.";
@@ -516,29 +593,70 @@ export const getUserProfile = async (token: string) => {
 
 // API function to create a new route
 export const createRoute = async (token: string, origin: string, destination: string, duration: number) => {
+  console.log("=== CREATE ROUTE DEBUG ===");
+  console.log("1. Token reçu:", token ? `${token.substring(0, 30)}...` : "NULL");
+  console.log("2. Origin:", origin);
+  console.log("3. Destination:", destination);
+  console.log("4. Duration:", duration);
+  
   try {
-    const response = await fetch(`${API_BASE_URL}/routes`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        origin,
-        destination,
-        duration
-      })
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    if (!token) {
+      throw new Error("Token d'authentification manquant");
     }
     
-    const route = await response.json();
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
+    };
+    
+    console.log("5. Headers préparés");
+    
+    const bodyData = {
+      origin,
+      destination,
+      duration
+    };
+    
+    const url = `${API_BASE_URL}/routes`;
+    console.log("6. URL complète:", url);
+    
+    console.log("7. Envoi de la requête...");
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(bodyData),
+      mode: 'cors',
+      credentials: 'omit'
+    });
+    
+    console.log("8. Réponse reçue:");
+    console.log("   - Status:", response.status);
+    console.log("   - StatusText:", response.statusText);
+    
+    const responseText = await response.text();
+    console.log("   - Response body:", responseText);
+    
+    if (!response.ok) {
+      if (response.status === 403 || response.status === 401) {
+        console.error(" Authentification rejetée par le backend");
+      }
+      
+      try {
+        const errorData = JSON.parse(responseText);
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      } catch (parseError) {
+        throw new Error(responseText || `HTTP error! status: ${response.status}`);
+      }
+    }
+    
+    const route = JSON.parse(responseText);
+    console.log("✅ Route créée avec succès:", route);
     return route;
   } catch (error) {
-    console.error("Error creating route:", error);
+    console.error("=== CREATE ROUTE ERROR ===");
+    console.error("Type:", error instanceof Error ? error.constructor.name : typeof error);
+    console.error("Message:", error instanceof Error ? error.message : String(error));
     throw error;
   }
 };
@@ -587,7 +705,27 @@ export const getRoutes = async (token: string) => {
     return routes;
   } catch (error) {
     console.error("Error fetching agency routes:", error);
-    // Retourner un tableau vide en cas d'erreur pour éviter de casser l'interface
     return [];
+  }
+};
+// Récupérer les itinéraires de l'agence connectée
+export const getAgencyRoutes = async (token: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/routes`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching agency routes:", error);
+    throw error;
   }
 };

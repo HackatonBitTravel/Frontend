@@ -93,28 +93,21 @@ const SearchResults = () => {
     fetchResults();
   }, [searchParams, toast, origin, destination, date, minPriceParam, maxPriceParam]); // Add new dependencies
 
-  const filteredResults = useMemo(() => {
-    return results.filter((schedule) => {
-      // Backend now handles price filtering, but we keep client-side for additional filters
-      if (schedule.price < priceRange[0] || schedule.price > priceRange[1]) {
-        return false;
-      }
-      if (minRating > 0 && (schedule.agency_rating || 0) < minRating) {
-        return false;
-      }
-      if (selectedAgencies.length > 0 && !selectedAgencies.includes(schedule.agency_name)) {
-        return false;
-      }
+  const now = new Date();
+const filteredResults = useMemo(() => {
+  return results
+    .filter(s => new Date(s.departure_time) >= now) // Filtre côté front
+    .filter((schedule) => {
+      if (schedule.price < priceRange[0] || schedule.price > priceRange[1]) return false;
+      if (minRating > 0 && (schedule.agency_rating || 0) < minRating) return false;
+      if (selectedAgencies.length > 0 && !selectedAgencies.includes(schedule.agency_name)) return false;
       if (selectedTimes.length > 0) {
-        const period = getDeparturePeriod(format(new Date(schedule.departure_time), "HH:mm")); // Use departure_time
-        if (!selectedTimes.includes(period)) {
-          return false;
-        }
+        const period = getDeparturePeriod(format(new Date(schedule.departure_time), "HH:mm"));
+        if (!selectedTimes.includes(period)) return false;
       }
       return true;
     });
-  }, [results, priceRange, selectedAgencies, selectedTimes, minRating]);
-
+}, [results, priceRange, selectedAgencies, selectedTimes, minRating]);
   const handleAgencyChange = (agency: string) => {
     setSelectedAgencies((prev) =>
       prev.includes(agency)
