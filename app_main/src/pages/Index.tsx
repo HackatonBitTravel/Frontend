@@ -134,9 +134,7 @@ const Index = () => {
                   Destinations les plus fréquentées cette semaine
                 </p>
               </div>
-              <Button variant="outline" className="hidden md:flex">
-                Voir tous les itinéraires
-              </Button>
+
             </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
