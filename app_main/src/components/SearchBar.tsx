@@ -48,7 +48,7 @@ const SearchBar = ({ variant = "hero" }: SearchBarProps) => {
         isHero ? "bg-card shadow-elevated rounded-2xl p-6" : "bg-card shadow-card rounded-xl p-4"
       } animate-fade-in`}
     >
-      <div className={`grid gap-4 ${isHero ? "md:grid-cols-4" : "md:grid-cols-6"}`}> {/* Adjusted grid columns */}
+      <div className={`grid gap-4 ${isHero ? "md:grid-cols-2" : "md:grid-cols-4"}`}> {/* Adjusted grid columns */}
         <div className="relative">
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">De</label>
           <div className="relative">
@@ -90,7 +90,7 @@ const SearchBar = ({ variant = "hero" }: SearchBarProps) => {
           </Popover>
         </div>
 
-        <div className="relative">
+        {/* <div className="relative">
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Prix Min</label>
           <Input
             type="number"
@@ -108,7 +108,7 @@ const SearchBar = ({ variant = "hero" }: SearchBarProps) => {
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
           />
-        </div>
+        </div>  */}
 
         <Button
           className="bg-gradient-hero hover:opacity-90 mt-auto h-10"

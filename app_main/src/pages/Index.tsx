@@ -4,6 +4,9 @@ import RouteCard from "@/components/RouteCard";
 import Chatbot from "@/components/Chatbot";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
+import routeDakar from "@/assets/route-dakar.jpg";
+import routeBamako from "@/assets/route-bamako.jpg";
+import routeAbidjan from "@/assets/route-abidjan.jpg";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, Shield, Zap, Bitcoin } from "lucide-react";
@@ -150,7 +153,7 @@ const Index = () => {
                   : popularRoutes.map((route, idx) => (
                       <Card key={idx} className="p-4 shadow-card">
                         <img
-                          src={"https://placehold.co/400x200?text=Image+de+voyage"} // Placeholder image
+                          src={routeBamako} // Placeholder image
                           alt={`${route.origin} to ${route.destination}`}
                           className="w-full h-48 object-cover rounded-lg mb-4"
                         />
