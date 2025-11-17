@@ -62,9 +62,10 @@ const AgencyLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <div className="container mx-auto px-4 py-16">
+      <main className="flex-1 flex items-center">
+                <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Portail Agence</h1>
@@ -142,6 +143,7 @@ const AgencyLogin = () => {
           </Card>
         </div>
       </div>
+      </main>
        <Footer />
     </div>
   );
